@@ -12,25 +12,41 @@ function App() {
   const baseUrl = "https://localhost:5001/api/alunos";
 
   const [data, setData] = useState();
-  const [alunoSelecionado, setAlunoSelecionado] = useState({
+  const [updateData, setUpdateData] = useState(true);
+  const [selectedStudentObj, setSelectedStudent] = useState({
     id: "",
     nome: "",
     email: "",
     idade: "",
   });
-  const [showModal, setShowModal] = useState(false);
 
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.addEventListener("mouseenter", Swal.stopTimer);
+      toast.addEventListener("mouseleave", Swal.resumeTimer);
+    },
+  });
+
+  const [showModal, setShowModal] = useState(false);
   const openCloseModalInclude = () => {
     setShowModal(!showModal);
+  };
+  const [showModalEdit, setShowModalEdit] = useState(false);
+  const openCloseModalEdit = () => {
+    setShowModalEdit(!showModalEdit);
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setAlunoSelecionado({
-      ...alunoSelecionado,
+    setSelectedStudent({
+      ...selectedStudentObj,
       [name]: value,
     });
-    console.log(alunoSelecionado);
   };
 
   const listStudents = async () => {
@@ -46,30 +62,43 @@ function App() {
 
   useEffect(() => {
     listStudents();
-  }, []);
+    setUpdateData(false);
+  }, [updateData]);
 
   const addStudent = async () => {
-    const Toast = Swal.mixin({
-      toast: true,
-      position: "top-end",
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.addEventListener("mouseenter", Swal.stopTimer);
-        toast.addEventListener("mouseleave", Swal.resumeTimer);
-      },
-    });
-    delete alunoSelecionado.id;
-    alunoSelecionado.idade = parseInt(alunoSelecionado.idade);
+    delete selectedStudentObj.id;
+    selectedStudentObj.idade = parseInt(selectedStudentObj.idade);
     await axios
-      .post(baseUrl, alunoSelecionado)
+      .post(baseUrl, selectedStudentObj)
       .then((response) => {
-        setData(data.concat(response.data));
+        setUpdateData(true);
         openCloseModalInclude();
         Toast.fire({
           icon: "success",
           title: "Aluno adicionado!",
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const selectedStudent = (id) => {
+    const edit = data.filter((s) => s.id === id)[0];
+    setSelectedStudent(edit);
+    openCloseModalEdit();
+  };
+
+  const editStudent = async () => {
+    selectedStudentObj.idade = parseInt(selectedStudentObj.idade);
+    await axios
+      .put(`${baseUrl}/${selectedStudentObj.id}`, selectedStudentObj)
+      .then((response) => {
+        setUpdateData(true);
+        openCloseModalEdit();
+        Toast.fire({
+          icon: "success",
+          title: "Aluno editado!",
         });
       })
       .catch((error) => {
@@ -86,20 +115,23 @@ function App() {
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Sim, excluir!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        axios
-          .delete(`${baseUrl}/${id}`)
-          .then((response) => {
-            console.log(response);
-            listStudents();
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-        Swal.fire("Excluído!", "Aluno excluido.", "success");
-      }
-    });
+    })
+      .then((result) => {
+        if (result.isConfirmed) {
+          axios
+            .delete(`${baseUrl}/${id}`)
+            .then((response) => {
+              setUpdateData(true);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          Swal.fire("Excluído!", "Aluno excluído.", "success");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
@@ -134,7 +166,10 @@ function App() {
                 <td>{aluno.idade}</td>
                 <td>
                   <div className="d-flex justify-content-center gap-3">
-                    <button className="btn btn-outline-primary">
+                    <button
+                      className="btn btn-outline-primary"
+                      onClick={() => selectedStudent(aluno.id)}
+                    >
                       <Pen size={20} />
                       <span className="p-1">Editar</span>
                     </button>
@@ -189,6 +224,62 @@ function App() {
             Incluir
           </button>
           <button className="btn btn-primary" onClick={openCloseModalInclude}>
+            Cancelar
+          </button>
+        </ModalFooter>
+      </Modal>
+
+      {/* Modal Editar */}
+      <Modal isOpen={showModalEdit}>
+        <ModalHeader>Editar Alunos</ModalHeader>
+        <ModalBody>
+          <div className="form-group d-flex flex-column gap-3">
+            <label>
+              <span>ID:</span>
+              <input
+                type="text"
+                className="form-control"
+                readOnly
+                value={selectedStudentObj && selectedStudentObj.id}
+              />
+            </label>
+            <label>
+              <span>Nome:</span>
+              <input
+                type="text"
+                name="nome"
+                className="form-control"
+                onChange={handleChange}
+                value={selectedStudentObj && selectedStudentObj.nome}
+              />
+            </label>
+            <label>
+              <span>E-mail:</span>
+              <input
+                type="email"
+                name="email"
+                className="form-control"
+                onChange={handleChange}
+                value={selectedStudentObj && selectedStudentObj.email}
+              />
+            </label>
+            <label>
+              <span>Idade:</span>
+              <input
+                type="text"
+                name="idade"
+                className="form-control"
+                onChange={handleChange}
+                value={selectedStudentObj && selectedStudentObj.idade}
+              />
+            </label>
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <button className="btn btn-primary" onClick={editStudent}>
+            Editar
+          </button>
+          <button className="btn btn-primary" onClick={openCloseModalEdit}>
             Cancelar
           </button>
         </ModalFooter>
