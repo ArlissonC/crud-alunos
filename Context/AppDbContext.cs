@@ -2,39 +2,34 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AlunosApi.Context
 {
     public class AppDbContext : IdentityDbContext<IdentityUser>
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options)
+          : base(options)
         {
-
         }
-
-        public DbSet<Aluno> Alunos { get; set; }
+        public virtual DbSet<Aluno> Alunos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Aluno>().HasData(
                 new Aluno
                 {
                     Id = 1,
                     Nome = "Maria da Penha",
-                    Email = "mariadapenha@yahoo.com",
-                    Idade = 23,
+                    Email = "mariapenha@yahoo.com",
+                    Idade = 23
                 },
-
                 new Aluno
                 {
                     Id = 2,
-                    Nome = "Manuel Duarte",
-                    Email = "manuelduarte@yahoo.com",
-                    Idade = 22,
+                    Nome = "Manuel Bueno",
+                    Email = "manuelbueno@yahoo.com",
+                    Idade = 22
                 }
             );
         }
