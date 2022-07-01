@@ -1,0 +1,12 @@
+.form input {
+  padding: 20px 45px;
+  outline: none;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: none;
+}
+
+.icon_login {
+  top: 16px;
+  left: 10px;
+}
