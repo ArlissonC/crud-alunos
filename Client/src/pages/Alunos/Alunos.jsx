@@ -1,6 +1,6 @@
 import styles from "./Alunos.module.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Trash, Pen, SignOut, User } from "phosphor-react";
 import { useEffect, useState } from "react";
 import api from "../../services/api";
