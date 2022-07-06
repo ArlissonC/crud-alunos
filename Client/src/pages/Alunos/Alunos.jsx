@@ -28,6 +28,12 @@ const Alunos = () => {
     }, token);
   };
 
+  const editAluno = async (id) => {
+    try {
+      Navigate(`/aluno/novo/${id}`);
+    } catch (error) {}
+  };
+
   useEffect(() => {
     getAlunos();
   }, []);
@@ -80,7 +86,11 @@ const Alunos = () => {
                   </b>
                 </div>
                 <div className="d-flex flex-column gap-2">
-                  <button type="button" className="btn">
+                  <button
+                    type="button"
+                    className="btn"
+                    onClick={() => editAluno(aluno.id)}
+                  >
                     <Pen size={24} />
                   </button>
                   <button type="button" className="btn">
