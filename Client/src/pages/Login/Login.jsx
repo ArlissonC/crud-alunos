@@ -1,6 +1,6 @@
 import styles from "./Login.module.css";
-import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useState } from "react";
 import { UserCircle, LockKey } from "phosphor-react";
 import api from "../../services/api";
 import { useNavigate } from "react-router-dom";

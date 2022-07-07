@@ -1,5 +1,4 @@
 import styles from "./NovoAluno.module.css";
-import "bootstrap/dist/css/bootstrap.min.css";
 import { UserPlus, ArrowUDownLeft } from "phosphor-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
